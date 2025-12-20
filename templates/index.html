@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Süt Tankı İzleme Sistemi</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; }
+        .konteyner { width: 50%; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-top: 50px; }
+        .kart { display: inline-block; width: 30%; margin: 10px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .sicaklik { color: #e74c3c; font-size: 24px; font-weight: bold; }
+        .miktar { color: #3498db; font-size: 24px; font-weight: bold; }
+        h1 { color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <div class="konteyner">
+        <h1>Süt Soğutma Tankı Takip Paneli</h1>
+        <hr>
+        <div class="kart">
+            <h3>Sıcaklık</h3>
+            <p class="sicaklik">{{ veri.sicaklik }} °C</p>
+        </div>
+        <div class="kart">
+            <h3>Doluluk</h3>
+            <p class="miktar">{{ veri.doluluk }} L</p>
+        </div>
+        <div class="kart">
+            <h3>Sistem Durumu</h3>
+            <p><strong>{{ veri.durum }}</strong></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,31 +1,31 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# Burası verilerin hafızada tutulduğu yer. 
-# Gerçek veriler gelene kadar içinde örnek bir veri olsun.
-tank_verileri = {
-    "sicaklik": 4.0,
-    "doluluk": 850,
-    "durum": "Sogutma Aktif"
+# 1. Buraya 'akim' bilgisini ekledik (Hafızada yer açtık)
+data = {
+    "sicaklik": 0,
+    "akim": 0, 
+    "durum": "Sistem Bekleniyor..."
 }
 
 @app.route('/')
-def ana_sayfa():
-    # Templates klasöründeki index.html dosyasını çalıştırır
-    # ve içindeki değişkenleri günceller.
-    return render_template('index.html', veri=tank_verileri)
+def index():
+    return render_template('index.html', data=data)
 
-# ESP32 ileride bu adrese veri gönderecek
 @app.route('/guncelle', methods=['POST'])
 def guncelle():
-    global tank_verileri
-    yeni_gelen = request.get_json()
-    tank_verileri.update(yeni_gelen)
-    return jsonify({"mesaj": "Veri güncellendi"}), 200
+    gelen_veri = request.get_json()
+    
+    # 2. ESP32'den gelen paketin içindeki 'sicaklik' ve 'akim'ı alıyoruz
+    data['sicaklik'] = gelen_veri.get('sicaklik', 0)
+    data['akim'] = gelen_veri.get('akim', 0) 
+    data['durum'] = gelen_veri.get('durum', "Aktif")
+    
+    print(f"Yeni Veri Geldi -> Sicaklik: {data['sicaklik']}, Akim: {data['akim']}")
+    return {"status": "success"}
 
 if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True)
+
     

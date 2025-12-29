@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# Verilerin tutulduğu sözlük - Virgüllere dikkat!
+# Verilerin tutulduğu sözlük
 data = {
     "sicaklik": 0,
     "akim": 0.0,
@@ -11,7 +11,6 @@ data = {
 
 @app.route('/')
 def index():
-    # Sitenin ana sayfasını açar ve verileri gönderir
     return render_template('index.html', data=data)
 
 @app.route('/guncelle', methods=['POST'])
@@ -30,5 +29,5 @@ def guncelle():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
+
 

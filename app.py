@@ -1,33 +1,31 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# Burası verilerin hafızada tutulduğu yer. 
-# Gerçek veriler gelene kadar içinde örnek bir veri olsun.
-tank_verileri = {
-    "sicaklik": 4.0,
-    "doluluk": 850,
-    "durum": "Sogutma Aktif"
+# Verilerin tutulduğu sözlük
+data = {
+    "sicaklik": 0,
+    "akim": 0.0,
+    "durum": "Sistem Aktif"
 }
 
 @app.route('/')
-def ana_sayfa():
-    # Templates klasöründeki index.html dosyasını çalıştırır
-    # ve içindeki değişkenleri günceller.
-    return render_template('index.html', veri=tank_verileri)
+def index():
+    return render_template('index.html', data=data)
 
-# ESP32 ileride bu adrese veri gönderecek
 @app.route('/guncelle', methods=['POST'])
 def guncelle():
-    global tank_verileri
-    yeni_gelen = request.get_json()
-    tank_verileri.update(yeni_gelen)
-    return jsonify({"mesaj": "Veri güncellendi"}), 200
+    try:
+        gelen_veri = request.get_json()
+        if gelen_veri:
+            # ESP32'den gelen verileri alıyoruz
+            data['sicaklik'] = gelen_veri.get('sicaklik', data['sicaklik'])
+            data['akim'] = gelen_veri.get('akim', data['akim'])
+            data['durum'] = gelen_veri.get('durum', data['durum'])
+            return {"status": "success"}, 200
+        return {"status": "error", "message": "Veri yok"}, 400
+    except Exception as e:
+        return {"status": "error", "message": str(e)}, 500
 
 if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-    
-
-
+    app.run(debug=True)

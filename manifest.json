@@ -1,0 +1,20 @@
+{
+  "short_name": "Süt Takip",
+  "name": "Süt Tankı İzleme Sistemi",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/hamzatalhaakdeniz207-ux/sut-takip/main/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/hamzatalhaakdeniz207-ux/sut-takip/main/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a73e8"
+}

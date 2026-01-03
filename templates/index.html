@@ -5,62 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Süt Tankı İzleme Sistemi</title>
     
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/hamzatalhaakdeniz207-ux/sut-takip/main/logo.png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/hamzatalhaakdeniz207-ux/sut-takip/main/logo.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/hamzatalhaakdeniz207-ux/sut-takip/main/logo.png">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Süt Takip">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; text-align: center; padding: 20px; margin: 0; }
-        .konteyner { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; font-size: 22px; margin-bottom: 20px; }
-        .kart-grubu { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
-        .kart { background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 20px; width: 130px; }
-        .etiket { font-size: 12px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
-        .deger { font-size: 22px; font-weight: bold; margin-top: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; text-align: center; padding: 15px; margin: 0; }
+        .konteyner { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .kart-grubu { display: flex; justify-content: space-around; gap: 10px; margin-bottom: 20px; }
+        .kart { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; flex: 1; }
+        .etiket { font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
+        .deger { font-size: 18px; font-weight: bold; margin-top: 5px; }
         .sicaklik { color: #e74c3c; }
-        .akim { color: #f39c12; }
-        .miktar { color: #3498db; }
-        .durum-cubugu { margin-top: 25px; padding: 10px; border-radius: 10px; background: #ecf0f1; color: #27ae60; font-weight: bold; }
-        <link rel="manifest" href="/manifest.json">
+        canvas { margin-top: 20px; max-height: 250px; }
     </style>
 
     <script>
-        // Sayfayı senin ayarladığın gibi 2500ms (2.5 saniye) aralıkla yeniler
-        setInterval(function(){ 
-            location.reload(); 
-        }, 2500);
+        // Sayfayı 2.5 saniyede bir yeniler
+        setInterval(function(){ location.reload(); }, 2500);
     </script>
 </head>
 <body>
     <div class="konteyner">
-        <h1>Süt Soğutma Paneli</h1>
-        <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 25px;">
+        <h3>Süt Soğutma Analiz Paneli</h3>
         
         <div class="kart-grubu">
             <div class="kart">
                 <div class="etiket">Sıcaklık</div>
                 <div class="deger sicaklik">{{ data.sicaklik }} °C</div>
             </div>
-
             <div class="kart">
                 <div class="etiket">Akım</div>
-                <div class="deger akim">{{ data.akim }} A</div>
+                <div class="deger">{{ data.akim }} A</div>
             </div>
-
             <div class="kart">
                 <div class="etiket">Doluluk</div>
-                <div class="deger miktar">{{ data.doluluk }} L</div>
+                <div class="deger" style="color:#3498db">{{ data.doluluk }} L</div>
             </div>
         </div>
 
-        <div class="durum-cubugu">
-            Sistem Durumu: {{ data.durum }}
-        </div>
+        <canvas id="sicaklikGrafik"></canvas>
     </div>
+
+    <script>
+        // Bu kısım Flask'tan gelen geçmiş verileri grafiğe döker
+        const ctx = document.getElementById('sicaklikGrafik').getContext('2d');
+        const sicaklikGrafik = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['10', '9', '8', '7', '6', '5', '4', '3', '2', 'Şimdi'],
+                datasets: [{
+                    label: 'Sıcaklık Geçmişi (°C)',
+                    data: [12, 11.5, 11, 10.2, 9.8, 9.2, 8.5, 8.1, 7.8, {{ data.sicaklik }}],
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: false } }
+            }
+        });
+    </script>
 </body>
 </html>
 

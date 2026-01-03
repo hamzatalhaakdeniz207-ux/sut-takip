@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 
 app = Flask(__name__)
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('.', 'manifest.json')
 
 # Verilerin tutulduğu sözlük
 data = {
@@ -29,3 +32,4 @@ def guncelle():
 
 if __name__ == '__main__':
     app.run(debug=True)
+

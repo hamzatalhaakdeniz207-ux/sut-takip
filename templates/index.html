@@ -2,53 +2,63 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Süt Tankı İzleme Sistemi</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; }
-        .konteyner { width: 60%; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-top: 50px; }
-        .kart { display: inline-block; width: 25%; margin: 10px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; vertical-align: top; }
-        .sicaklik { color: #e74c3c; font-size: 24px; font-weight: bold; }
-        .akim { color: #f39c12; font-size: 24px; font-weight: bold; }
-        .miktar { color: #3498db; font-size: 24px; font-weight: bold; }
-        h1 { color: #2c3e50; }
-    </style>
-
+    
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/hamzatalhaakdeniz207-ux/sut-takip/main/logo.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/hamzatalhaakdeniz207-ux/sut-takip/main/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/hamzatalhaakdeniz207-ux/sut-takip/main/logo.png">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Süt Takip">
 
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; text-align: center; padding: 20px; margin: 0; }
+        .konteyner { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; font-size: 22px; margin-bottom: 20px; }
+        .kart-grubu { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .kart { background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 20px; width: 130px; }
+        .etiket { font-size: 12px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
+        .deger { font-size: 22px; font-weight: bold; margin-top: 10px; }
+        .sicaklik { color: #e74c3c; }
+        .akim { color: #f39c12; }
+        .miktar { color: #3498db; }
+        .durum-cubugu { margin-top: 25px; padding: 10px; border-radius: 10px; background: #ecf0f1; color: #27ae60; font-weight: bold; }
+    </style>
+
     <script>
-        // Sayfayı 2.5 saniyede bir yeniler
-        setInterval(function(){ location.reload(); }, 3500);
+        // Sayfayı senin ayarladığın gibi 2500ms (2.5 saniye) aralıkla yeniler
+        setInterval(function(){ 
+            location.reload(); 
+        }, 2500);
     </script>
 </head>
 <body>
     <div class="konteyner">
-        <h1>Süt Soğutma Tankı Takip Paneli</h1>
-        <hr>
+        <h1>Süt Soğutma Paneli</h1>
+        <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 25px;">
         
-        <div class="kart">
-            <h3>Sıcaklık</h3>
-            <p class="sicaklik">{{ data.sicaklik }} °C</p>
+        <div class="kart-grubu">
+            <div class="kart">
+                <div class="etiket">Sıcaklık</div>
+                <div class="deger sicaklik">{{ data.sicaklik }} °C</div>
+            </div>
+
+            <div class="kart">
+                <div class="etiket">Akım</div>
+                <div class="deger akim">{{ data.akim }} A</div>
+            </div>
+
+            <div class="kart">
+                <div class="etiket">Doluluk</div>
+                <div class="deger miktar">{{ data.doluluk }} L</div>
+            </div>
         </div>
 
-        <div class="kart">
-            <h3>Anlık Akım</h3>
-            <p class="akim">{{ data.akim }} A</p>
-        </div>
-
-        <div class="kart">
-            <h3>Doluluk</h3>
-            <p class="miktar">{{ data.doluluk }} L</p>
-        </div>
-
-        <div class="kart">
-            <h3>Sistem Durumu</h3>
-            <p><strong>{{ data.durum }}</strong></p>
+        <div class="durum-cubugu">
+            Sistem Durumu: {{ data.durum }}
         </div>
     </div>
 </body>
 </html>
-

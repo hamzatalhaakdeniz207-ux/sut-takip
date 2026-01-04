@@ -10,17 +10,18 @@
         .konteyner { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .kart-grubu { display: flex; justify-content: space-around; gap: 10px; }
         
-        /* Tıklanabilir Sıcaklık Kartı Ayarı */
         .kart { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; flex: 1; transition: 0.3s; cursor: pointer; }
         .kart:active { transform: scale(0.95); background-color: #fcfcfc; }
         .etiket { font-size: 10px; color: #7f8c8d; text-transform: uppercase; }
         .deger { font-size: 18px; font-weight: bold; margin-top: 5px; }
+        
+        /* Renkler */
         .sicaklik-renk { color: #e74c3c; }
+        .doluluk-renk { color: #3498db; }
 
         /* Grafik Penceresi (Modal) Tasarımı */
-        #grafikPenceresi {
-            display: none; /* Başlangıçta gizli */
-            position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%;
+        .modal {
+            display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.5); 
         }
         .pencere-icerik {
@@ -33,57 +34,77 @@
 <body>
 
 <div class="konteyner">
-    <h3 style="color: #2c3e50; font-size: 18px;">Süt Tankı Kontrol Paneli</h3>
-    <p style="font-size: 12px; color: #bdc3c7;">Grafik için sıcaklığa tıkla</p>
+    <h3 style="color: #2c3e50; font-size: 18px;">Smart Milk Kontrol Paneli</h3>
+    <p style="font-size: 11px; color: #bdc3c7;">Detaylar için kutulara tıkla</p>
     
     <div class="kart-grubu">
-        <div class="kart" onclick="pencereyiAc()">
+        <div class="kart" onclick="pencereAc('sicaklikModal', 'sicaklikGrafik', 'sicaklik')">
             <div class="etiket">Sıcaklık</div>
             <div class="deger sicaklik-renk">{{ data.sicaklik }}°C</div>
         </div>
+        
         <div class="kart">
             <div class="etiket">Akım</div>
             <div class="deger" style="color:#f39c12">{{ data.akim }}A</div>
         </div>
-        <div class="kart">
+
+        <div class="kart" onclick="pencereAc('dolulukModal', 'dolulukGrafik', 'doluluk')">
             <div class="etiket">Doluluk</div>
-            <div class="deger" style="color:#3498db">{{ data.doluluk }}L</div>
+            <div class="deger doluluk-renk">{{ data.doluluk }}L</div>
         </div>
     </div>
 </div>
 
-<div id="grafikPenceresi">
+<div id="sicaklikModal" class="modal">
     <div class="pencere-icerik">
-        <span class="kapat-butonu" onclick="pencereyiKapat()">&times;</span>
-        <h4 style="margin-top: 0;">24 Saatlik Sıcaklık Analizi</h4>
-        <div style="height: 250px;">
-            <canvas id="sicaklikGrafik"></canvas>
-        </div>
+        <span class="kapat-butonu" onclick="pencereKapat('sicaklikModal')">&times;</span>
+        <h4 style="margin-top: 0;">Sıcaklık Analizi (0-30°C)</h4>
+        <div style="height: 250px;"><canvas id="sicaklikGrafik"></canvas></div>
+    </div>
+</div>
+
+<div id="dolulukModal" class="modal">
+    <div class="pencere-icerik">
+        <span class="kapat-butonu" onclick="pencereKapat('dolulukModal')">&times;</span>
+        <h4 style="margin-top: 0;">Süt Miktarı Analizi (Litre)</h4>
+        <div style="height: 250px;"><canvas id="dolulukGrafik"></canvas></div>
     </div>
 </div>
 
 <script>
-    // Sayfayı yenileme
+    // Sayfayı yenileme (Pencereler kapalıyken çalışır)
     setInterval(function(){ 
-        if(document.getElementById('grafikPenceresi').style.display !== 'block') {
+        if(document.getElementById('sicaklikModal').style.display !== 'block' && 
+           document.getElementById('dolulukModal').style.display !== 'block') {
             location.reload(); 
         }
     }, 5000);
 
-    function pencereyiAc() { document.getElementById('grafikPenceresi').style.display = "block"; cizdir(); }
-    function pencereyiKapat() { document.getElementById('grafikPenceresi').style.display = "none"; }
+    function pencereAc(modalId, canvasId, tip) {
+        document.getElementById(modalId).style.display = "block";
+        cizdir(canvasId, tip);
+    }
 
-    function cizdir() {
-        const ctx = document.getElementById('sicaklikGrafik').getContext('2d');
+    function pencereKapat(modalId) {
+        document.getElementById(modalId).style.display = "none";
+    }
+
+    function cizdir(canvasId, tip) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        let etiket = tip === 'sicaklik' ? 'Sıcaklık (°C)' : 'Doluluk (Litre)';
+        let renk = tip === 'sicaklik' ? '#e74c3c' : '#3498db';
+        let veri = tip === 'sicaklik' ? [4.2, 4.0, 5.5, 4.8, {{ data.sicaklik }}] : [120, 150, 180, 200, {{ data.doluluk }}];
+        let maxDeger = tip === 'sicaklik' ? 30 : 500; // Doluluk için max 500 Litre varsayıldı
+
         new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['00:00', '06:00', '12:00', '18:00', 'Şimdi'],
                 datasets: [{
-                    label: 'Sıcaklık (°C)',
-                    data: [4.2, 4.0, 5.5, 4.8, {{ data.sicaklik }}],
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    label: etiket,
+                    data: veri,
+                    borderColor: renk,
+                    backgroundColor: renk + '1A', // Hafif şeffaf dolgu
                     fill: true,
                     tension: 0.4
                 }]
@@ -91,7 +112,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: { y: { min: 0, max: 30 } }
+                scales: { y: { min: 0, max: maxDeger } }
             }
         });
     }
@@ -99,5 +120,3 @@
 
 </body>
 </html>
-
-

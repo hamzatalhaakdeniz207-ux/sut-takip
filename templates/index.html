@@ -1,45 +1,84 @@
-<script>
-    const ctx = document.getElementById('sicaklikGrafik').getContext('2d');
-    const sicaklikGrafik = new Chart(ctx, {
-        type: 'line',
-        data: {
-            // 24 saatlik dilimi temsil eden örnek etiketler
-            labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', 'Şimdi'],
-            datasets: [{
-                label: '24 Saatlik Sıcaklık Takibi (°C)',
-                // Buradaki veriler ESP32'den geldikçe dolacak
-                data: [4.5, 4.2, 4.0, 3.8, 4.1, 4.4, 4.2, 4.0, {{ data.sicaklik }}],
-                borderColor: '#e74c3c',
-                backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                borderWidth: 2,
-                pointRadius: 3, // Noktaları belirginleştirir
-                fill: true,
-                tension: 0.3 // Çizgiyi hafif kavisli yapar
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    // İSTEDİĞİN AYAR: 0'dan 30'a kadar gösterim
-                    min: 0,
-                    max: 30,
-                    ticks: {
-                        stepSize: 0.5, // Yan taraftaki sayıların artış hızı (0.5 - 1.0 vb.)
-                        callback: function(value) {
-                            return value.toFixed(1) + ' °C'; // 0.1 hassasiyetini gösterir
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Süt Tankı İzleme Sistemi</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; text-align: center; padding: 10px; margin: 0; }
+        .konteyner { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .kart-grubu { display: flex; justify-content: space-around; gap: 10px; margin-bottom: 15px; }
+        .kart { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 10px; flex: 1; }
+        .etiket { font-size: 10px; color: #7f8c8d; text-transform: uppercase; }
+        .deger { font-size: 16px; font-weight: bold; margin-top: 5px; }
+        .sicaklik { color: #e74c3c; }
+        /* Grafiğin boyutu */
+        .grafik-alani { position: relative; height: 300px; width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="konteyner">
+        <h3 style="color: #2c3e50; font-size: 18px;">Smart Milk Analiz</h3>
+        
+        <div class="kart-grubu">
+            <div class="kart">
+                <div class="etiket">Sıcaklık</div>
+                <div class="deger sicaklik">{{ data.sicaklik }}°C</div>
+            </div>
+            <div class="kart">
+                <div class="etiket">Akım</div>
+                <div class="deger" style="color:#f39c12">{{ data.akim }}A</div>
+            </div>
+            <div class="kart">
+                <div class="etiket">Doluluk</div>
+                <div class="deger" style="color:#3498db">{{ data.doluluk }}L</div>
+            </div>
+        </div>
+
+        <div class="grafik-alani">
+            <canvas id="sicaklikGrafik"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Sayfayı her 5 saniyede bir otomatik yeniler
+        setTimeout(function(){ location.reload(); }, 5000);
+
+        const ctx = document.getElementById('sicaklikGrafik').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', 'Şimdi'],
+                datasets: [{
+                    label: '24 Saatlik Takip (°C)',
+                    data: [4.5, 4.2, 4.8, 5.1, 4.9, 4.3, {{ data.sicaklik }}],
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 0, // 0 dereceden başlar
+                        max: 30, // 30 dereceye kadar çıkar
+                        ticks: {
+                            stepSize: 5, // Yandaki sayılar 5'er 5'er artar
+                            callback: function(value) { return value + ' °C'; }
                         }
                     }
                 }
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
             }
-        }
-    });
-</script>
+        });
+    </script>
+</body>
+</html>
+
 

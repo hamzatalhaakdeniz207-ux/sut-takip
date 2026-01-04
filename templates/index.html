@@ -1,73 +1,45 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Süt Tankı İzleme Sistemi</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; text-align: center; padding: 15px; margin: 0; }
-        .konteyner { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .kart-grubu { display: flex; justify-content: space-around; gap: 10px; margin-bottom: 20px; }
-        .kart { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; flex: 1; }
-        .etiket { font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
-        .deger { font-size: 18px; font-weight: bold; margin-top: 5px; }
-        .sicaklik { color: #e74c3c; }
-        canvas { margin-top: 20px; max-height: 250px; }
-    </style>
-
-    <script>
-        // Sayfayı 2.5 saniyede bir yeniler
-        setInterval(function(){ location.reload(); }, 2500);
-    </script>
-</head>
-<body>
-    <div class="konteyner">
-        <h3>Süt Soğutma Analiz Paneli</h3>
-        
-        <div class="kart-grubu">
-            <div class="kart">
-                <div class="etiket">Sıcaklık</div>
-                <div class="deger sicaklik">{{ data.sicaklik }} °C</div>
-            </div>
-            <div class="kart">
-                <div class="etiket">Akım</div>
-                <div class="deger">{{ data.akim }} A</div>
-            </div>
-            <div class="kart">
-                <div class="etiket">Doluluk</div>
-                <div class="deger" style="color:#3498db">{{ data.doluluk }} L</div>
-            </div>
-        </div>
-
-        <canvas id="sicaklikGrafik"></canvas>
-    </div>
-
-    <script>
-        // Bu kısım Flask'tan gelen geçmiş verileri grafiğe döker
-        const ctx = document.getElementById('sicaklikGrafik').getContext('2d');
-        const sicaklikGrafik = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['10', '9', '8', '7', '6', '5', '4', '3', '2', 'Şimdi'],
-                datasets: [{
-                    label: 'Sıcaklık Geçmişi (°C)',
-                    data: [12, 11.5, 11, 10.2, 9.8, 9.2, 8.5, 8.1, 7.8, {{ data.sicaklik }}],
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
+<script>
+    const ctx = document.getElementById('sicaklikGrafik').getContext('2d');
+    const sicaklikGrafik = new Chart(ctx, {
+        type: 'line',
+        data: {
+            // 24 saatlik dilimi temsil eden örnek etiketler
+            labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', 'Şimdi'],
+            datasets: [{
+                label: '24 Saatlik Sıcaklık Takibi (°C)',
+                // Buradaki veriler ESP32'den geldikçe dolacak
+                data: [4.5, 4.2, 4.0, 3.8, 4.1, 4.4, 4.2, 4.0, {{ data.sicaklik }}],
+                borderColor: '#e74c3c',
+                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                borderWidth: 2,
+                pointRadius: 3, // Noktaları belirginleştirir
+                fill: true,
+                tension: 0.3 // Çizgiyi hafif kavisli yapar
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    // İSTEDİĞİN AYAR: 0'dan 30'a kadar gösterim
+                    min: 0,
+                    max: 30,
+                    ticks: {
+                        stepSize: 0.5, // Yan taraftaki sayıların artış hızı (0.5 - 1.0 vb.)
+                        callback: function(value) {
+                            return value.toFixed(1) + ' °C'; // 0.1 hassasiyetini gösterir
+                        }
+                    }
+                }
             },
-            options: {
-                responsive: true,
-                scales: { y: { beginAtZero: false } }
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
             }
-        });
-    </script>
-</body>
-</html>
+        }
+    });
+</script>
 
